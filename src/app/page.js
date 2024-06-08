@@ -1,113 +1,216 @@
+"use client";
+import EditColumnComp from "@/components/EditColumnComp";
+import FilterComp from "@/components/filterComp";
+import FilterModal from "@/components/filterModal";
+import Sidebar from "@/components/sidebar";
+import TableComp from "@/components/TableComp";
+import ListSelect from "@/components/waitListCompoenet";
+import moment from "moment";
 import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+import { Button, Table } from "antd";
+import { CiCalendar } from "react-icons/ci";
+import { RxAvatar } from "react-icons/rx";
+import { PiWarningCircleLight } from "react-icons/pi";
 
+function getStatus(status) {
+  if (status === "active") {
+    return (
+      <div className="bg-green-100 text-center rounded-xl  ">
+        <span className="text-green-400 font-semobold ">Active</span>
+      </div>
+    );
+  } else if (status === "inactive") {
+    return (
+      <div className="bg-gray-100 rounded-xl text-center ">
+        <span className=" text-gray-400 font-semobold text-center ">
+          Inactive
+        </span>
+      </div>
+    );
+  } else {
+    return (
+      <div className="bg-blue-100 text-center rounded-xl ">
+        <span className="text-blue-400 font-semobold ">Lead</span>
+      </div>
+    );
+  }
+}
+
+const TODAY_TIME = new Date().getTime();
+const data = [];
+for (let i = 0; i < 20; i++) {
+  if (i % 5 == 0) {
+    data.push({
+      key: i,
+      created_on: moment(TODAY_TIME).subtract(18, "minutes").calendar(),
+      status: getStatus("lead"),
+      payer: `Mike Teller  ${i}`,
+      email: "mike@gmail.com",
+      payer_phone: "+91 8765758356",
+      services: `Private language session. ${i}`,
+      scheduled: moment().format("MMMM Do YYYY, h:mm:ss a"),
+    });
+  } else if (i % 2 == 0) {
+    data.push({
+      key: i,
+      created_on: moment(TODAY_TIME).subtract(1, "days").calendar(),
+      status: getStatus("active"),
+      payer: `James row  ${i}`,
+      email: "james@gmail.com",
+      payer_phone: "+91 7665758356",
+      services: `Boxing session. ${i}`,
+      scheduled: moment().format("MMMM Do YYYY, h:mm:ss a"),
+    });
+  } else {
+    data.push({
+      key: i,
+      created_on: moment(TODAY_TIME).subtract(15, "minutes").calendar(),
+      status: getStatus("inactive"),
+      payer: `Peter Thomsan ${i}`,
+      email: "peter@gmail.com",
+      payer_phone: "+91 9965758686",
+      services: `Appointment session. ${i}`,
+      scheduled: moment().format("MMMM Do YYYY, h:mm:ss a"),
+    });
+  }
+}
+
+const COLUMN = [
+  {
+    title: (
+      <div className="flex items-center gap-2 ">
+        <CiCalendar /> <p>Created On</p>
+      </div>
+    ),
+    dataIndex: "created_on",
+  },
+  {
+    title: (
+      <div className="flex items-center gap-2 ">
+        <RxAvatar /> <p>Payer</p>
+      </div>
+    ),
+    dataIndex: "payer",
+  },
+  {
+    title: (
+      <div className="flex items-center gap-2 ">
+        <PiWarningCircleLight /> <p>Status</p>
+      </div>
+    ),
+    dataIndex: "status",
+    width: 130,
+  },
+  {
+    title: "Email",
+    dataIndex: "email",
+  },
+  {
+    title: "Payer Phone",
+    dataIndex: "payer_phone",
+  },
+  {
+    title: "Services",
+    dataIndex: "services",
+  },
+  {
+    title: "Scheduled",
+    dataIndex: "scheduled",
+  },
+];
 export default function Home() {
+  const [collapsed, setCollapsed] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchPayers, setSearchPayers] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editColumnData, setEditColumnData] = useState([]);
+  const [updatedColumn, setUpdatedColumn] = useState(COLUMN);
+
+  function editColumnChange(values) {
+    let set = new Set([...editColumnData, ...values]);
+    localStorage.setItem("edit", JSON.stringify(values));
+    let myData = JSON.parse(localStorage.getItem("edit"));
+
+    let result = [...set].filter((x) => myData.includes(x));
+    console.log(myData, "=====================vbalues=====================");
+    setEditColumnData(result);
+  }
+  console.log(editColumnData, "editColumnData");
+  const updatedData = useMemo(() => {
+    if (searchPayers === "") {
+      return data;
+    } else {
+      return data.filter((val) => {
+        return val?.payer?.toLowerCase().includes(searchPayers.toLowerCase());
+      });
+    }
+  }, [searchPayers]);
+
+  // Submit Edit column
+
+  function submitEditColumn() {
+    let res = COLUMN.filter(
+      (item) => !editColumnData.includes(item?.dataIndex)
+    );
+    console.log(res, "-----------------------");
+    if (editColumnData.length > 0) {
+      setUpdatedColumn(res);
+    } else {
+      setUpdatedColumn(COLUMN);
+    }
+  }
+
+  // Reset Deafault
+  function resetDefaultCoumn() {
+    setEditColumnData([]);
+    setUpdatedColumn(COLUMN);
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <div className="h-screen flex w-full ">
+      <aside className={`h-screen  ${collapsed ? "w-[80px]" : "w-[256px]"} `}>
+        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      </aside>
+      <main
+        className={` m-3 p-3 overflow-y-auto rounded-md shadow-xl bg-white ${
+          collapsed ? "w-[calc(100vw-80px)]" : "w-[calc(100vw-256px)]"
+        }`}
+      >
+        <h2 className="font-bold ">Waitlist</h2>
+        <ListSelect />
+        <FilterComp
+          setIsModalOpen={setIsModalOpen}
+          setSearchPayers={setSearchPayers}
+          searchPayers={searchPayers}
+          setIsEditModalOpen={setIsEditModalOpen}
         />
-      </div>
+        <TableComp
+          updatedData={updatedData}
+          editColumnData={editColumnData}
+          column={updatedColumn}
+        />
+      </main>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+      {Boolean(isModalOpen) && (
+        <FilterModal
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          data={data ?? []}
+        />
+      )}
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      {Boolean(isEditModalOpen) && (
+        <EditColumnComp
+          open={isEditModalOpen}
+          setOpen={setIsEditModalOpen}
+          editColumnChange={editColumnChange}
+          submitEditColumn={submitEditColumn}
+          editColumnData={editColumnData}
+          resetDefaultCoumn={resetDefaultCoumn}
+          updatedColumn={updatedColumn}
+        />
+      )}
+    </div>
   );
 }
