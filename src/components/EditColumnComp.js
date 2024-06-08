@@ -41,7 +41,6 @@ const EditColumnComp = ({
   resetDefaultCoumn,
   updatedColumn,
 }) => {
-  console.log(editColumnData, "editColumnData");
   return (
     <>
       <Modal
@@ -71,7 +70,6 @@ const EditColumnComp = ({
         <div>
           <Checkbox.Group onChange={editColumnChange}>
             {CLOUMN_NAME.map((item, i) => {
-              console.log(updatedColumn.dataIndex !== item.value);
               return (
                 <div key={i} className="w-[200px] my-1 ">
                   <Checkbox checked={true} value={item.value}>

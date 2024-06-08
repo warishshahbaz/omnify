@@ -62,13 +62,6 @@ const TableComp = ({ updatedData, editColumnData, column }) => {
     onChange: onSelectChange,
   };
 
-  // const updatedColumn = useMemo(() => {
-  //   let res = COLUMN.filter(
-  //     (item) => !editColumnData.includes(item?.dataIndex)
-  //   );
-  //   console.log(res);
-  // }, [editColumnData]);
-
   return (
     <div className="h-[400px] mt-3 ">
       <Table

@@ -133,10 +133,10 @@ export default function Home() {
     let myData = JSON.parse(localStorage.getItem("edit"));
 
     let result = [...set].filter((x) => myData.includes(x));
-    console.log(myData, "=====================vbalues=====================");
+
     setEditColumnData(result);
   }
-  console.log(editColumnData, "editColumnData");
+
   const updatedData = useMemo(() => {
     if (searchPayers === "") {
       return data;
@@ -153,7 +153,7 @@ export default function Home() {
     let res = COLUMN.filter(
       (item) => !editColumnData.includes(item?.dataIndex)
     );
-    console.log(res, "-----------------------");
+
     if (editColumnData.length > 0) {
       setUpdatedColumn(res);
     } else {
