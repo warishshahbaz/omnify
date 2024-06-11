@@ -1,57 +1,8 @@
-import React, { useMemo, useState } from "react";
-import { Button, Table } from "antd";
-import { CiCalendar } from "react-icons/ci";
-import { RxAvatar } from "react-icons/rx";
-import { PiWarningCircleLight } from "react-icons/pi";
-import moment from "moment";
+import React, { useState } from "react";
+import { Table } from "antd";
 
-const TableComp = ({ updatedData, editColumnData, column }) => {
+const TableComp = ({ updatedData, column }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  // const COLUMN = [
-  //   {
-  //     title: (
-  //       <div className="flex items-center gap-2 ">
-  //         <CiCalendar /> <p>Created On</p>
-  //       </div>
-  //     ),
-  //     dataIndex: "created_on",
-  //   },
-  //   {
-  //     title: (
-  //       <div className="flex items-center gap-2 ">
-  //         <RxAvatar /> <p>Payer</p>
-  //       </div>
-  //     ),
-  //     dataIndex: "payer",
-  //   },
-  //   {
-  //     title: (
-  //       <div className="flex items-center gap-2 ">
-  //         <PiWarningCircleLight /> <p>Status</p>
-  //       </div>
-  //     ),
-  //     dataIndex: "status",
-  //     width: 130,
-  //   },
-  //   {
-  //     title: "Email",
-  //     dataIndex: "email",
-  //   },
-  //   {
-  //     title: "Payer Phone",
-  //     dataIndex: "payer_phone",
-  //   },
-  //   {
-  //     title: "Services",
-  //     dataIndex: "services",
-  //   },
-  //   {
-  //     title: "Scheduled",
-  //     dataIndex: "scheduled",
-  //   },
-  // ];
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
